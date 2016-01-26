@@ -36,12 +36,14 @@ if (options.port is None):
 #CON_ID = {'host':options.mpdhost, 'port':options.mpdport}
 ledboard = Ledboard(options.port,options.speed)
 
-def sendLine(line,speed=0.25,hold=0):
+def sendLine(line,speed=0.25,hold=0,fullscroll=True):
     buffer = " " * 18
     line = unicodedata.normalize('NFKD',unicode(line)).encode('ascii','ignore')
+    if fullscroll:
+        line = ' '*len(buffer)+line+' '*len(buffer)
     if len(line) <= len(buffer):
-        buffer=string.center(line,len(buffer))
-        ledboard.drawstring(buffer,font())
+            buffer=string.center(line,len(buffer))
+            ledboard.drawstring(buffer,font())
     else:
         buffer=line[:len(buffer)]
         ledboard.drawstring(buffer,font())
@@ -53,7 +55,7 @@ def sendLine(line,speed=0.25,hold=0):
     time.sleep(hold)
 
 def showTime():
-    sendLine(time.strftime("%H.%M.%S"),0.33)
+    sendLine(time.strftime("%H.%M.%S"),0.33,fullscroll=False)
 
 def showMPD():
     client = MPDClient()
@@ -74,20 +76,18 @@ def showMPD():
                 pass
         else:
             song=client.currentsong()['file']
-        sendLine("Now playing: "+song,hold=1)
+        sendLine("Now playing: "+song,0,0)
     except:
         pass
 #        sendLine("Not Playing.")
 
 def showBitcoin():
-  #Koers
   _b_usd = urllib2.urlopen('https://btc-e.com/api/2/btc_usd/ticker')
   _l_usd = urllib2.urlopen('https://btc-e.com/api/2/ltc_usd/ticker')
   b_usd = json.load(_b_usd)
   l_usd = json.load(_l_usd)
-
   value="B/U %s | L/U %s" % (b_usd['ticker']['last'],l_usd['ticker']['last'])
-  sendLine(value,speed=0.01,hold=1)
+  sendLine(value,speed=0,hold=0)
 
 class GetLine(LineReceiver):
     delimiter='\n'
@@ -113,7 +113,7 @@ timr.start(0.333, now=True)
 mpdr=LoopingCall(showMPD)
 mpdr.start(60, now=True)
 bitr=LoopingCall(showBitcoin)
-bitr.start(91, now=True)
+bitr.start(91)
 kilr=LoopingCall(ledboard.disconnect)
 kilr.start(360)
 reactor.listenTCP(55555, LineFact())
