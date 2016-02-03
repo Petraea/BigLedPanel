@@ -82,12 +82,15 @@ def showMPD():
 #        sendLine("Not Playing.")
 
 def showBitcoin():
-  _b_usd = urllib2.urlopen('https://btc-e.com/api/2/btc_usd/ticker')
-  _l_usd = urllib2.urlopen('https://btc-e.com/api/2/ltc_usd/ticker')
-  b_usd = json.load(_b_usd)
-  l_usd = json.load(_l_usd)
-  value="B/U %s | L/U %s" % (b_usd['ticker']['last'],l_usd['ticker']['last'])
-  sendLine(value,speed=0,hold=0)
+    try:
+        _b_usd = urllib2.urlopen('https://btc-e.com/api/2/btc_usd/ticker')
+        _l_usd = urllib2.urlopen('https://btc-e.com/api/2/ltc_usd/ticker')
+        b_usd = json.load(_b_usd)
+        l_usd = json.load(_l_usd)
+        value="B/U %s | L/U %s" % (b_usd['ticker']['last'],l_usd['ticker']['last'])
+        sendLine(value,speed=0,hold=0)
+    except:
+        pass
 
 class GetLine(LineReceiver):
     delimiter='\n'

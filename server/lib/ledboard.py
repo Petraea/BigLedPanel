@@ -14,7 +14,10 @@ class Ledboard:
         self.ser = serial.Serial(self.port, self.speed, timeout=1)
 
     def disconnect(self):
-        self.ser.flush()
+        try:
+            self.ser.flush()
+        except:
+            pass
         self.ser.close()
         self.ser = None
 
